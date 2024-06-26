@@ -2,11 +2,12 @@ import Phaser from "phaser";
 import Gun from "./Gun";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, key) {
+    constructor(scene, x, y, key, infoObj) {
         super(scene, x, y, key);
         this.scene = scene;
         this.isOnPlatform = false;
         this.setScale(3); // Set scale of the player sprite
+        this.infoObj = infoObj;
 
         // Add this player to the scene and enable physics on it
         this.scene.add.existing(this);
@@ -56,12 +57,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.isDamaged = false;
         });
         this.scene.cameras.main.shake(100, 0.01); // Shake the camera
-        this.health -= 3; // Decrease player's health
+        this.health -= 10; // Decrease player's health
         this.healthBar.setSize((this.displayWidth) * this.health / 100, 5); // Update health bar
         if (this.health <= 0) {
             this.scene.time.delayedCall(200, () => {
                 this.game_over_sound.play(); // Play game over sound
-                this.scene.scene.restart(); // Restart the scene
+                this.infoObj.removeLife();
+                if (this.infoObj.lives <= 0) {
+                    this.infoObj.saveHighScore();
+                    this.scene.scene.start("GameOverScene", { score: this.infoObj.score }); // Start the game over scene
+                } else {
+                    this.scene.scene.restart({ lives: this.infoObj.lives, score: this.infoObj.score }); // Restart the scene
+                }
             });
         }
     }
@@ -74,14 +81,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Handle left and right movement
         if (this.cursors.left.isDown) {
-            this.setVelocityX(-180);
+            this.setVelocityX(-220);
             this.flipX = true; // Flip sprite to face left
 
             if (this.body.touching.down && this.isOnPlatform) {
                 this.anims.play("player_run_anim", true); // Play run animation
             }
         } else if (this.cursors.right.isDown) {
-            this.setVelocityX(180);
+            this.setVelocityX(220);
             this.flipX = false; // Flip sprite to face right
 
             if (this.body.touching.down && this.isOnPlatform) {
@@ -95,7 +102,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Handle jumping
         if ((this.cursors.up.isDown || this.spaceBar.isDown) && this.isOnPlatform) {
-            this.setVelocityY(-350); // Set jump velocity
+            this.setVelocityY(-500); // Set jump velocity
             this.isOnPlatform = false;
         }
 

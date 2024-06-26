@@ -38,8 +38,11 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image("metal_slug", "/images/metal_slug.PNG");
         this.load.image("bg", "/images/bg.png");
         this.load.image("play_btn", "/images/play.png");
+        this.load.image("replay_btn", "/images/replay.png");
         this.load.image("gun", "/images/gun.png");
         this.load.image("bullet", "/images/bullet.png");
+        this.load.image("heart", "/images/heart.png");
+        this.load.image("gameover", "/images/gameover.png");
 
         // Load player spritesheets
         this.load.spritesheet("player_idle", "/images/Player/idle.png", {

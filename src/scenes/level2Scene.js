@@ -1,12 +1,18 @@
 import Phaser from "phaser";
 import Player from "../components/Player"; // Import Player class
 import Enemy from "../components/Enemy"; // Import Enemy class
+import Info from "../components/Info";
 
 export default class Level2Scene extends Phaser.Scene {
     constructor() {
         super({
             key: "Level2Scene" // Key to identify this scene
         });
+    }
+
+    init(data) {
+        this.lives = data.lives ?? 3;
+        this.score = data.score ?? 0;
     }
 
     create() {
@@ -25,8 +31,9 @@ export default class Level2Scene extends Phaser.Scene {
     }
 
     addPlayer() {
+        this.info = new Info(this, this.lives, this.score);
         // Create a new player at position (400, 500) with "player_idle" sprite
-        this.player = new Player(this, 400, 500, "player_idle");
+        this.player = new Player(this, 400, 500, "player_idle", this.info);
 
         // Add collision detection between the player and platforms
         this.physics.add.collider(this.player, this.platforms, (player, platform) => {
@@ -39,7 +46,7 @@ export default class Level2Scene extends Phaser.Scene {
     addEnemies() {
         // Create 9 enemies at specified positions
         for (let i = 0; i < 9; i++) {
-            const enemy = new Enemy(this, 900 + i * 300, 200, "enemy_idle");
+            const enemy = new Enemy(this, 900 + i * 300, 200, "enemy_idle", this.info);
             this.enemies.add(enemy);
         }
 
@@ -132,7 +139,7 @@ export default class Level2Scene extends Phaser.Scene {
         if (this.enemies.getChildren().length === 0 && !this.isGameOver) {
             this.isGameOver = true;
             setTimeout(() => {
-                this.scene.start("Level3Scene"); // Start Level 3 scene after a delay
+                this.scene.start("Level3Scene", { lives: this.info.lives, score: this.info.score }); // Start Level 3 scene after a delay
             }, 1000);
         }
     }

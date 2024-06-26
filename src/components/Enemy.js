@@ -1,10 +1,11 @@
 import Phaser from "phaser";
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, key) {
+    constructor(scene, x, y, key, playerInfoObj) {
         super(scene, x, y, key);
         this.scene = scene;
         this.isOnPlatform = false;
+        this.playerInfoObj = playerInfoObj;
         this.setScale(3.5); // Set scale of the enemy sprite
         this.flipX = true; // Flip sprite horizontally
         this.health = 100; // Set initial health
@@ -37,12 +38,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.setTint(0xffffff); // Reset tint after delay
             this.isDamaged = false; // Reset damage flag
         });
-        this.health -= 20; // Reduce health
+        this.health -= 25; // Reduce health
         this.healthBar.setSize((this.displayWidth) * this.health / 100, 5); // Update health bar size
         if (this.health <= 0) { // Check if health is depleted
             this.healthBarBg.destroy(); // Destroy health bar background
             this.healthBar.destroy(); // Destroy health bar
             this.destroy(); // Destroy the enemy
+            this.playerInfoObj.score++;
+            this.playerInfoObj.updateScore();
         }
     }
 
