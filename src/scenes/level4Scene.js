@@ -138,6 +138,7 @@ export default class Level4Scene extends Phaser.Scene {
         if (this.enemies.getChildren().length === 0 && !this.isGameOver) {
             this.isGameOver = true;
             setTimeout(() => {
+                this.info.saveHighScore();
                 this.scene.start("GameOverScene", { score: this.score });
             }, 1000);
         }

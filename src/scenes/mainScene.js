@@ -33,5 +33,13 @@ export default class MainScene extends Phaser.Scene {
             this.scene.start("Level1Scene"); // Start Level 1 scene
             this.button_click_sound.play(); // Play button click sound
         });
+
+        this.helpText = this.add.text(this.game.config.width / 2, this.game.config.height - 30, `Use "Z" key to shoot, Use "U" key to attack with knife, and Use "I" key to attack with bomb.`, {
+            fontSize: "24px",
+            fill: "#ffffff",
+            fontStyle: "bold",
+            fontFamily: "Arial"
+        });
+        this.helpText.setOrigin(0.5);
     }
 }

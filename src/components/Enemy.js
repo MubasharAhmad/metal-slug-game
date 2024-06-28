@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import EnemyGun from "./EnemyGun";
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, key, playerInfoObj) {
@@ -24,26 +25,26 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // Create health bar background and health bar
         this.healthBarBg = this.scene.add.rectangle(0, 0, this.displayWidth, 5, 0x262b44).setOrigin(0, 0.5);
         this.healthBar = this.scene.add.rectangle(0, 0, this.displayWidth, 5, 0xff0000).setOrigin(0, 0.5);
+
+        this.gun = new EnemyGun(this.scene, this.x, this.y, "gun2");
         
         // Add enemy hit sound
         this.enemy_hit_sound = this.scene.sound.add("enemy_hit");
     }
 
-    damage() {
+    damage(value = 25) {
         if (this.isDamaged) return; // Prevent multiple damage calls
-        this.enemy_hit_sound.play(); // Play hit sound
-        this.setTint(0xff0000); // Change tint to red
         this.isDamaged = true; // Set damage flag
         this.scene.time.delayedCall(300, () => {
-            this.setTint(0xffffff); // Reset tint after delay
             this.isDamaged = false; // Reset damage flag
         });
-        this.health -= 25; // Reduce health
+        this.health -= value; // Reduce health
         this.healthBar.setSize((this.displayWidth) * this.health / 100, 5); // Update health bar size
         if (this.health <= 0) { // Check if health is depleted
             this.healthBarBg.destroy(); // Destroy health bar background
             this.healthBar.destroy(); // Destroy health bar
             this.destroy(); // Destroy the enemy
+            this.gun.destroy();
             this.playerInfoObj.score++;
             this.playerInfoObj.updateScore();
         }
@@ -63,11 +64,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         } else if (this.x > this.scene.player.x) {
             this.flipX = true;
         }
+        this.gun.setPosition(this.x + (this.flipX ? -15 : 15), this.y + 5);
+        this.gun.flipX = this.flipX; // Flip gun sprite based on enemy direction
 
         // Move towards the player if within range
         if (Math.abs(this.scene.player.x - this.x) < 400 && Math.abs(this.scene.player.x - this.x) > 10) {
             this.setVelocityX(this.flipX ? -this.speed : this.speed); // Set velocity based on direction
             this.anims.play("enemy_run_anim", true); // Play run animation
+            this.gun.fire({ isLeft: this.flipX }); // Fire gun
         } else {
             this.setVelocityX(0); // Stop moving if out of range
         }

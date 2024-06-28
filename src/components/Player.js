@@ -8,6 +8,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.isOnPlatform = false;
         this.setScale(3); // Set scale of the player sprite
         this.infoObj = infoObj;
+        this.isShooting = true;
 
         // Add this player to the scene and enable physics on it
         this.scene.add.existing(this);
@@ -26,13 +27,53 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.spaceBar = this.scene.input.keyboard.addKey(
             Phaser.Input.Keyboard.KeyCodes.SPACE
         );
-        this.KeyF = this.scene.input.keyboard.addKey(
-            Phaser.Input.Keyboard.KeyCodes.F
+        this.KeyZ = this.scene.input.keyboard.addKey(
+            Phaser.Input.Keyboard.KeyCodes.Z
+        );
+        this.KeyU = this.scene.input.keyboard.addKey(
+            Phaser.Input.Keyboard.KeyCodes.U
+        );
+        this.KeyI = this.scene.input.keyboard.addKey(
+            Phaser.Input.Keyboard.KeyCodes.I
         );
 
-        // Fire the gun when the "F" key is pressed
-        this.KeyF.on("down", () => {
+        // Fire the gun when the "Z" key is pressed
+        this.KeyZ.on("down", () => {
             this.gun.fire({ isLeft: this.flipX });
+            if (!this.isShooting) {
+                this.scene.tweens.add({
+                    targets: this.gun,
+                    rotation: 0,
+                    duration: 150,
+                })
+            }
+            this.isShooting = true;
+        });
+        
+        // Knife when U is pressed
+        this.KeyU.on("down", () => {
+            this.gun.fire({ isLeft: this.flipX, bulletType: "knife" });
+            if (this.isShooting) {
+                this.scene.tweens.add({
+                    targets: this.gun,
+                    rotation: this.gun.flipX ? -0.5 : 0.5,
+                    duration: 150,
+                })
+            }
+            this.isShooting = false;
+        });
+        
+        // Bomb when I is pressed
+        this.KeyI.on("down", () => {
+            this.gun.fire({ isLeft: this.flipX, bulletType: "bomb" });
+            if (this.isShooting) {
+                this.scene.tweens.add({
+                    targets: this.gun,
+                    rotation: this.gun.flipX ? -0.5 : 0.5,
+                    duration: 150,
+                })
+            }
+            this.isShooting = false;
         });
 
         // Create a new gun and attach it to the player
@@ -47,6 +88,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.game_over_sound = this.scene.sound.add("game_over");
     }
 
+    rotateGun() {
+        if (this.isShooting) {
+            this.scene.tweens.add({
+                targets: this.gun,
+                rotation: 0,
+                duration: 300,
+            })
+        } else {
+            
+        }
+    }
+
     damage() {
         if (this.isDamaged) return; // Prevent taking damage if already damaged
         this.player_hit_sound.play(); // Play hit sound
@@ -57,7 +110,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.isDamaged = false;
         });
         this.scene.cameras.main.shake(100, 0.01); // Shake the camera
-        this.health -= 10; // Decrease player's health
+        this.health -= 8; // Decrease player's health
         this.healthBar.setSize((this.displayWidth) * this.health / 100, 5); // Update health bar
         if (this.health <= 0) {
             this.scene.time.delayedCall(200, () => {
@@ -114,6 +167,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Update the gun position to follow the player
         this.gun.setPosition(this.x + (this.flipX ? -20 : 20), this.y - 8);
         this.gun.flipX = this.flipX;
+        this.gun.setRotation(this.flipX ? -Math.abs(this.gun.rotation) : Math.abs(this.gun.rotation))
 
         // Update the health bar position to follow the player
         this.healthBarBg.x = this.x - this.displayWidth / 2;

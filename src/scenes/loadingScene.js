@@ -40,10 +40,19 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image("play_btn", "/images/play.png");
         this.load.image("replay_btn", "/images/replay.png");
         this.load.image("gun", "/images/gun.png");
+        this.load.image("gun2", "/images/gun2.png");
+        this.load.image("knife", "/images/knife.png");
+        this.load.image("bomb", "/images/bomb.png");
         this.load.image("bullet", "/images/bullet.png");
         this.load.image("heart", "/images/heart.png");
         this.load.image("gameover", "/images/gameover.png");
 
+        // Load explosion spritesheets
+        this.load.spritesheet("explosion", "/images/explosion.png", {
+            frameWidth: 128,
+            frameHeight: 80
+        });
+        
         // Load player spritesheets
         this.load.spritesheet("player_idle", "/images/Player/idle.png", {
             frameWidth: 16,
@@ -162,6 +171,17 @@ export default class LoadingScene extends Phaser.Scene {
             }),
             frameRate: 5, // Frames per second
             repeat: -1 // Loop indefinitely
+        });
+
+        // Create explosion animation
+        this.anims.create({
+            key: "explosion_anim",
+            frames: this.anims.generateFrameNumbers("explosion", {
+                start: 0,
+                end: 9
+            }),
+            frameRate: 10, // Frames per second
+            repeat: 0
         });
 
         // Start the main game scene
