@@ -31,8 +31,10 @@ export default class Gun extends Phaser.GameObjects.Sprite {
         });
 
         // Add overlap check between explosions and enemies
-        this.scene.physics.add.overlap(this.explosions, this.scene.enemies, (bullet, enemy) => {
-            enemy.damage(10); // Call damage method on enemy
+        this.scene.physics.add.overlap(this.explosions, this.scene.enemies, (explosion, enemy) => {
+            if (explosion.enemy === enemy) return;
+            enemy.damage(50); // Call damage method on enemy
+            explosion.enemy = enemy;
         });
         
         // Create the bombs group
@@ -51,8 +53,8 @@ export default class Gun extends Phaser.GameObjects.Sprite {
 
         // Add overlap check between bullets and enemies
         this.scene.physics.add.overlap(this.bullets, this.scene.enemies, (bullet, enemy) => {
+            enemy.damage(bullet.bulletType === "knife" ? 20 : 35); // Call damage method on enemy
             bullet.destroy(); // Destroy bullet on collision
-            enemy.damage(); // Call damage method on enemy
         });
 
         // Add shoot sound
@@ -69,6 +71,7 @@ export default class Gun extends Phaser.GameObjects.Sprite {
             bullet = this.bombs.create(this.x + (isLeft ? -offsetX : offsetX), this.y - 4, bulletType);
         } else {
             bullet = this.bullets.create(this.x + (isLeft ? -offsetX : offsetX), this.y - 4, bulletType);
+            bullet.bulletType = bulletType;
         }
         bullet.setScale(bulletType === "bullet" ? 1 : 2);
 
@@ -80,9 +83,9 @@ export default class Gun extends Phaser.GameObjects.Sprite {
 
         // Set bullet velocity based on the direction
         if (isLeft) {
-            bullet.setVelocityX(bulletType === "bomb" ? -350 : -500); // Move left
+            bullet.setVelocityX(-500); // Move left
         } else {
-            bullet.setVelocityX(bulletType === "bomb" ? 350 : 500); // Move right
+            bullet.setVelocityX(500); // Move right
         }
     }
 }

@@ -32,12 +32,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.enemy_hit_sound = this.scene.sound.add("enemy_hit");
     }
 
-    damage(value = 25) {
-        if (this.isDamaged) return; // Prevent multiple damage calls
-        this.isDamaged = true; // Set damage flag
-        this.scene.time.delayedCall(300, () => {
-            this.isDamaged = false; // Reset damage flag
-        });
+    damage(value = 35) {
         this.health -= value; // Reduce health
         this.healthBar.setSize((this.displayWidth) * this.health / 100, 5); // Update health bar size
         if (this.health <= 0) { // Check if health is depleted
